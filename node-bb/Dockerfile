@@ -1,4 +1,4 @@
-FROM ghcr.io/nodebb/nodebb:4.10.3
+FROM ghcr.io/nodebb/nodebb:4.11.2
  
 WORKDIR /usr/src/app
 

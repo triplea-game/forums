@@ -1,0 +1,4 @@
+- hosts: tag_forums
+  tasks:
+    - name: Deploy latest forum
+      command: sudo /usr/local/bin/deploy-forums.sh

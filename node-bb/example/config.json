@@ -1,10 +1,10 @@
 {
-    "url": "http://0.0.0.0:8080",
-    "secret": "6c5e0d10-ea73-4835-bf2b-51979001fbd8",
+    "url": "https://forums.triplea-game.org",
+    "secret": "replace-with-a-random-secret",
     "database": "mongo",
-    "port": "8080",
+    "port": "4567",
     "mongo": {
-        "host": "192.168.1.231",
+        "host": "mongodb",
         "port": "27017",
         "username": "",
         "password": "",

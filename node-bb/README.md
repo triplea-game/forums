@@ -4,6 +4,34 @@ The software that powers the TripleA Forums is [NodeBB](https://github.com/NodeB
 This document is instructions on how to build and run the Docker container of the forums using an
 [official Docker container of NodeBB](https://hub.docker.com/r/nodebb/docker) as the base image.
 
+## Docker Compose
+
+The recommended way to run the forums in production. From the project root:
+
+```shell
+# First-time setup: create host directories and drop in a config.json
+mkdir -p /opt/triplea-forums/uploads/{category,emoji,files,profile,sounds,system}
+cp node-bb/example/config.json /opt/triplea-forums/config.json
+# Edit config.json: set a random secret and verify the mongo connection details
+
+# Build and start (MongoDB + NodeBB)
+docker compose up -d --build
+
+# View logs
+docker compose logs -f nodebb
+
+# Stop everything
+docker compose down
+
+# Upgrade NodeBB: update the FROM version in node-bb/Dockerfile, then
+docker compose up -d --build
+```
+
+NodeBB listens on `127.0.0.1:4567` and is proxied by nginx running on the host.
+MongoDB is on an internal Docker network and not reachable from outside the server.
+
+---
+
 ## Building
 
 1. Build the Docker image using the command ```docker build -t triplea-forums:latest .```
@@ -65,7 +93,7 @@ the list of Docker image versions on [https://hub.docker.com/_/mongo](https://hu
 
 This command will start the Docker container:
 ```shell script
-docker run --rm --name mongodb -p 27017:27017 -d mongo:4.4
+docker run --rm --name mongodb -p 27017:27017 -d mongo:8.0.21
 ```
 
 To stop the container, run ```docker stop mongodb```
@@ -83,7 +111,7 @@ purposes if you mount a volume directory for storing the data. The below command
 This command will start the Docker container:
 
 ```shell script
-docker run --rm --name mongodb -p 27017:27017 -v /opt/triple-forums/datadir:/data/db -d mongo:4.4
+docker run --rm --name mongodb -p 27017:27017 -v /opt/triple-forums/datadir:/data/db -d mongo:8.0.21
 ```
 
 To stop the container, run ```docker stop mongodb```

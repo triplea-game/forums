@@ -1,5 +1,5 @@
-FROM nodebb/docker:v1.13.3
-
+FROM ghcr.io/nodebb/nodebb:4.10.3
+ 
 WORKDIR /usr/src/app
 
 ARG NODE_ENV

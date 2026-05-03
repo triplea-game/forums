@@ -1,0 +1,31 @@
+services:
+  mongodb:
+    image: mongo:8.0.21
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - forums_internal
+
+  nodebb:
+    build: ./node-bb
+    restart: unless-stopped
+    user: "1001:1001"
+    ports:
+      # Bind only to localhost so nginx (running on the host) can proxy to
+      # port 4567, but the port is not reachable from outside the server.
+      - "127.0.0.1:4567:4567"
+    volumes:
+      - /opt/triplea-forums/config.json:/opt/config/config.json:ro
+      - /opt/triplea-forums/uploads:/usr/src/app/public/uploads
+    depends_on:
+      - mongodb
+    networks:
+      - forums_internal
+
+volumes:
+  mongodb_data:
+
+networks:
+  forums_internal:
+

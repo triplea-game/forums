@@ -35,7 +35,6 @@ jobs:
           file: ./node-bb/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          labels: ${{ steps.meta.outputs.labels }}
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push

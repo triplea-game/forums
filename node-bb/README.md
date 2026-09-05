@@ -125,8 +125,7 @@ is written to that version.
 
 | TripleA Forums | NodeBB Version | Package Json                                                                              |
 |----------------|----------------|-------------------------------------------------------------------------------------------|
-| Current        | 1.13.3         | [package.json source](https://github.com/NodeBB/NodeBB/blob/v1.13.3/install/package.json) |
-| Future         | 1.14.3         | [package.json source](https://github.com/NodeBB/NodeBB/blob/v1.14.3/install/package.json) |
+| Current        | 4.15.2         | [package.json source](https://github.com/NodeBB/NodeBB/blob/v4.15.2/install/package.json) |
 
 #### Upgrading To A Newer NodeBB Version
 

@@ -16,8 +16,10 @@ services:
       # port 4567, but the port is not reachable from outside the server.
       - "127.0.0.1:4567:4567"
     volumes:
-      - /opt/triplea-forums/config.json:/opt/config/config.json:ro
-      - /opt/triplea-forums/uploads:/usr/src/app/public/uploads
+      # Seeds config from the checked-in example; its 'url' points at prod, so
+      # copy it out and set url to http://localhost:4567 to browse locally.
+      - ./node-bb/example/config.json:/opt/config/config.json:ro
+      - nodebb_uploads:/usr/src/app/public/uploads
     depends_on:
       - mongodb
     networks:
@@ -25,6 +27,7 @@ services:
 
 volumes:
   mongodb_data:
+  nodebb_uploads:
 
 networks:
   forums_internal:

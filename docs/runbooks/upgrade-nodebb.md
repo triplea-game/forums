@@ -84,7 +84,7 @@ A healthy startup shows:
 
 ```
 info: 🎉 NodeBB Ready
-info: 🤝 Setting 'trust proxy' to true
+info: 🤝 Setting 'trust proxy' to 1
 info: 🔗 Canonical URL: https://forums.triplea-game.org
 info: 📡 NodeBB is now listening on: 0.0.0.0:4567
 ```
@@ -113,8 +113,10 @@ can log in, and a topic loads.
   The local-dev stack solves the same requirement differently (writable mount,
   container-root under rootless Podman); see `run-forums-locally.md`. Its local
   settings must never be copied into the prod template.
-- **`trust_proxy: true` must stay in `config.json`.** The forums sit behind
-  nginx; without it, redirects and canonical URLs break.
+- **`trust_proxy: 1` must stay in `config.json`.** The forums sit behind
+  nginx; without it, redirects and canonical URLs break. It is `1`, not
+  `true`, on purpose: `1` trusts exactly the nginx hop, whereas `true` trusts
+  every hop and lets a client spoof its IP via `X-Forwarded-For`.
 - **Plugins gate the boot.** If NodeBB starts but a plugin errors, the plugin
   version is likely behind the new NodeBB major — bump it in
   `install/package.json` and re-push.

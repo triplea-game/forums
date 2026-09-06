@@ -26,7 +26,7 @@ CI builds the image and deploys it; there is no manual build or SSH step.
    entries at versions compatible with the new NodeBB major.
 4. **Push to `master`** — `.github/workflows/publish-docker.yml` builds/publishes
    `ghcr.io/triplea-game/forums/nodebb:latest` and runs the deploy job.
-5. **Verify** — logs show `🎉 NodeBB Ready` and `Setting 'trust proxy' to true`;
+5. **Verify** — logs show `🎉 NodeBB Ready` and `Setting 'trust proxy' to 1`;
    `https://forums.triplea-game.org` loads and login works.
 
 Stop and consult the runbook for: plugin-compatibility failures, rollback, or

@@ -87,7 +87,7 @@ lives only in the infrastructure repo.
 A healthy local boot still logs a few warnings that are expected off-nginx and
 do not block startup — `🎉 NodeBB Ready` follows them:
 
-- `Setting 'trust proxy' to false` — correct locally; production sets it true
+- `Setting 'trust proxy' to false` — correct locally; production sets it to 1
   because it sits behind nginx.
 - `nodebb-plugin-web-push … Vapid subject is not an https: or mailto: URL` — the
   push plugin dislikes the plain `http://localhost` URL; web push simply doesn't
@@ -102,7 +102,7 @@ repo, so the two cannot cross by accident — but for the record, everything tha
 makes local work differs deliberately from prod: `user: "0:0"` (prod pins 1001),
 the plaintext `nodebb` database password (prod vaults it), and the
 `http://localhost:4567` URL with no `trust_proxy` (prod is `https` behind nginx
-with `trust_proxy: true`).
+with `trust_proxy: 1`).
 
 ## Troubleshooting
 

@@ -10,8 +10,9 @@ build or SSH step for a normal version bump.
 ## How the pieces fit
 
 - The image is built from `node-bb/Dockerfile` (its `FROM` pins the NodeBB
-  version) plus `node-bb/install/package.json` (dependencies and the TripleA
-  plugin set).
+  version by tag and digest) plus `node-bb/install/package.json` and
+  `package-lock.json` (the dependency tree, installed with `npm ci` so a build
+  reproduces the lock exactly or fails).
 - On push to `master`, `.github/workflows/publish-docker.yml` builds that
   image, publishes it as `ghcr.io/triplea-game/forums/nodebb:latest`, and then
   runs the `deploy` job. Deploy runs `just deploy`, whose playbook SSHes to the
@@ -43,31 +44,47 @@ whatever `node-bb/Dockerfile` `FROM` points at on `master`.
    breaking changes and required plugin versions per release. Note the tag, eg
    `v4.16.0`.
 
-3. **Line up plugin compatibility.** An incompatible plugin blocks boot. For the
-   target NodeBB major, find the compatible version of each TripleA plugin
-   (`nodebb-plugin-*` / `nodebb-theme-*` in `install/package.json`) before you
-   start editing.
+3. **Line up plugin compatibility.** An incompatible plugin blocks boot. The
+   plugins and themes in `install/package.json` are NodeBB's own bundled set,
+   so the target release's file already carries compatible versions; this step
+   only bites for a plugin this repo has added on top of stock.
 
 ## Make the change
 
-Both files live under `node-bb/`.
+All three files live under `node-bb/`.
 
-1. **Bump the base image** in `node-bb/Dockerfile`:
+1. **Bump the base image** in `node-bb/Dockerfile`, tag and digest together.
+   The digest is what actually pins the build; get it from the registry rather
+   than trusting the tag:
 
    ```
-   FROM ghcr.io/nodebb/nodebb:<new-version>
+   docker pull ghcr.io/nodebb/nodebb:<new-version>
+   docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/nodebb/nodebb:<new-version>
+   ```
+
+   ```
+   FROM ghcr.io/nodebb/nodebb:<new-version>@sha256:<digest>
    ```
 
 2. **Sync `node-bb/install/package.json`** to the new release. Take NodeBB's
-   own `install/package.json` at the target tag as the baseline —
+   own `install/package.json` at the target tag —
    `https://github.com/NodeBB/NodeBB/blob/v<new-version>/install/package.json` —
-   then re-apply the TripleA-specific changes on top:
-   - Set `version` to the new NodeBB version.
-   - Replace `dependencies` / `devDependencies` with the target release's set.
-   - Restore the TripleA plugin and theme entries (the `nodebb-plugin-*` and
-     `nodebb-theme-*` lines), each at the version you confirmed for this NodeBB
-     major in preflight. This is the file's whole reason to diverge from stock —
-     don't lose it to a wholesale copy-paste.
+   and re-apply whatever this repo has changed on top of stock. Today that is
+   nothing: the file is byte-identical to upstream, and every plugin and theme
+   the forums run ships in NodeBB's own dependency list. Diff before you copy
+   so a future TripleA-only entry does not get lost.
+
+3. **Regenerate `node-bb/install/package-lock.json`** inside the new base
+   image, so the lock resolves against the tree that image already carries
+   rather than whatever the registry serves today:
+
+   ```
+   just lock
+   ```
+
+   The image build runs `npm ci`, which refuses to build if package.json and
+   the lock disagree, so a bump that skips this step fails in CI before it can
+   reach production. Review the lock diff like any other dependency change.
 
 ## Ship it
 
@@ -119,4 +136,7 @@ can log in, and a topic loads.
   every hop and lets a client spoof its IP via `X-Forwarded-For`.
 - **Plugins gate the boot.** If NodeBB starts but a plugin errors, the plugin
   version is likely behind the new NodeBB major — bump it in
-  `install/package.json` and re-push.
+  `install/package.json`, run `just lock`, and re-push.
+- **`npm ci` fails the build on a stale lock.** A `build-and-push` failure
+  right after the `COPY` step means `package.json` changed without `just lock`;
+  regenerate and re-push.

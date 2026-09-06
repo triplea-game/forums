@@ -53,6 +53,18 @@ psql:
 deploy:
     ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook -e ansible_user={{ssh_user}} --inventory deploy/ansible/inventory.linode.yml deploy/ansible/playbook.yml
 
+# Regenerate node-bb/install/package-lock.json inside the Dockerfile's pinned
+# base image, so the lock resolves against the tree that image already ships
+# rather than whatever the registry serves today. Run after any package.json
+# change or NodeBB bump; the image build's 'npm ci' rejects a stale lock.
+lock:
+    base=$(grep -oE '^FROM \S+' node-bb/Dockerfile | cut -d' ' -f2); \
+    docker run --rm --entrypoint sh -v "$PWD/node-bb/install":/work:ro "$base" -c \
+      'cp /work/package.json /usr/src/app/package.json && cd /usr/src/app \
+       && npm install --package-lock-only --omit=dev --ignore-scripts --no-audit --no-fund >&2 \
+       && cat package-lock.json' > node-bb/install/package-lock.json
+    @echo "wrote node-bb/install/package-lock.json — review the diff"
+
 # Seed a gitignored local config from the tracked example if it does not exist.
 _seed-config:
     @test -f {{config}} || { cp node-bb/example/config.json {{config}}; echo "seeded {{config}} from example"; }

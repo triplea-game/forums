@@ -23,8 +23,8 @@ Registry, and deploys it (`just deploy`). The host side (compose file,
 
 ## Layout
 
-- `node-bb/` — the NodeBB image (`Dockerfile`, `install/package.json`) and its
-  [README](node-bb/README.md).
+- `node-bb/` — the NodeBB image (`Dockerfile`, `install/package.json` and its
+  lockfile) and its [README](node-bb/README.md).
 - `docker-compose.yml` + `justfile` — the local dev stack.
 - `docs/runbooks/` — run locally, and upgrade the NodeBB version.
 - `deploy/` — the Ansible playbook CI runs to deploy.

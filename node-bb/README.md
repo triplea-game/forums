@@ -2,7 +2,7 @@
 
 The TripleA Forums run [NodeBB](https://github.com/NodeBB/NodeBB), backed by
 Postgres, packaged as a Docker image built from this directory's `Dockerfile`
-and `install/package.json`.
+and `install/package.json` + `package-lock.json`.
 
 ## Running locally
 
@@ -57,7 +57,9 @@ This is the NodeBB version the forums currently run; the README and
 ## Plugins
 
 NodeBB customizations are plugins, installed by pinning them in
-`install/package.json` (the `nodebb-plugin-*` and `nodebb-theme-*` entries) and
-rebuilding the image. That file is the authoritative list; see
-`docs/runbooks/upgrade-nodebb.md` for how the TripleA plugin set is carried
-across a version bump.
+`install/package.json` (the `nodebb-plugin-*` and `nodebb-theme-*` entries),
+running `just lock`, and rebuilding the image. That file is the authoritative
+list. Today it is byte-identical to NodeBB's own `install/package.json`: every
+plugin and theme the forums run is one NodeBB bundles, so a version bump is a
+straight copy of upstream plus a lock regeneration (see
+`docs/runbooks/upgrade-nodebb.md`).

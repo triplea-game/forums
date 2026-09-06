@@ -15,15 +15,17 @@ the two disagree, the runbook wins.
 
 ## Happy path
 
-A version bump is two edits in this repo (`triplea-game/forums`) plus a push —
+A version bump is three edits in this repo (`triplea-game/forums`) plus a push —
 CI builds the image and deploys it; there is no manual build or SSH step.
 
 1. **Back up Postgres first** — `sudo /usr/local/bin/backup-forums.sh` on the
    forums host. Schema upgrades run on first boot and aren't cleanly reversible.
-2. **Bump `node-bb/Dockerfile`** — `FROM ghcr.io/nodebb/nodebb:<new-version>`.
-3. **Sync `node-bb/install/package.json`** — take NodeBB's `install/package.json`
-   at the target tag as the baseline, then re-apply the TripleA plugin/theme
-   entries at versions compatible with the new NodeBB major.
+2. **Bump `node-bb/Dockerfile`** — `FROM ghcr.io/nodebb/nodebb:<new-version>@sha256:<digest>`,
+   digest taken from the registry (runbook has the commands).
+3. **Sync `node-bb/install/package.json`** — copy NodeBB's `install/package.json`
+   at the target tag, re-applying any TripleA-only entries (today: none), then
+   **`just lock`** to regenerate `package-lock.json` inside the new base image.
+   `npm ci` in the image build fails if the two disagree.
 4. **Push to `master`** — `.github/workflows/publish-docker.yml` builds/publishes
    `ghcr.io/triplea-game/forums/nodebb:latest` and runs the deploy job.
 5. **Verify** — logs show `🎉 NodeBB Ready` and `Setting 'trust proxy' to 1`;

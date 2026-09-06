@@ -6,7 +6,7 @@ which runs NodeBB on Postgres 18 (the `forums` role in
 `triplea-game/infrastructure`); it does not touch production.
 
 The local stack is just the `docker-compose.yml` in this repo, driven by a
-`justfile`. Production is deployed by CI on push to `master` (`make deploy`) —
+`justfile`. Production is deployed by CI on push to `master` (`just deploy`) —
 nothing here is involved in that.
 
 ## Prerequisites

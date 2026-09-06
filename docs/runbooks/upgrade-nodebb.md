@@ -14,7 +14,7 @@ build or SSH step for a normal version bump.
   plugin set).
 - On push to `master`, `.github/workflows/publish-docker.yml` builds that
   image, publishes it as `ghcr.io/triplea-game/forums/nodebb:latest`, and then
-  runs the `deploy` job. Deploy runs `make deploy`, whose playbook SSHes to the
+  runs the `deploy` job. Deploy runs `just deploy`, whose playbook SSHes to the
   forums host and runs `/usr/local/bin/deploy-forums.sh` — `docker compose pull
   nodebb && docker compose up -d --no-deps nodebb`.
 - The host side (the compose file, `config.json`, Postgres, secrets, the

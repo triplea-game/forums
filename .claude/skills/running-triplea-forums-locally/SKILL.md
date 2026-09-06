@@ -32,7 +32,7 @@ port already in use, or setup hanging on a rejected admin password.
 
 ## Not for production
 
-These recipes never touch production — prod is deployed by CI (`make deploy`) and
+These recipes never touch production — prod is deployed by CI (`just deploy`) and
 its config comes from the infrastructure `forums` role. Local-only settings
 (container-root, plaintext DB password, `http://localhost` without `trust_proxy`)
 must not be copied into the prod templates.

@@ -2,7 +2,7 @@
 #
 # Runs the forums stack (NodeBB + Postgres) on your machine, mirroring the
 # production database (Postgres 18). Production itself is deployed by CI on push
-# to master (`make deploy`); nothing here touches production.
+# to master (`just deploy`); nothing here touches production.
 #
 # First run: `just up` builds the image, starts Postgres, sets up the schema and
 # an admin user, then starts NodeBB on http://localhost:4567.
@@ -16,6 +16,9 @@ config := "node-bb/config.local.json"
 export ADMIN_USER := env_var_or_default("ADMIN_USER", "admin")
 export ADMIN_PASSWORD := env_var_or_default("ADMIN_PASSWORD", "admin-local-123")
 export ADMIN_EMAIL := env_var_or_default("ADMIN_EMAIL", "admin@localhost.local")
+
+# Deploy uses this ssh user (defaults to $USER); CI passes SSH_USER=deploy.
+ssh_user := env_var_or_default("SSH_USER", env_var_or_default("USER", ""))
 
 # List recipes
 default:
@@ -45,6 +48,10 @@ logs:
 # Open a psql shell on the local Postgres (database 'nodebb', user 'nodebb').
 psql:
     {{compose}} exec postgres psql -U nodebb -d nodebb
+
+# Deploy to production — CI runs this on push to master; nothing local touches prod.
+deploy:
+    ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook -e ansible_user={{ssh_user}} --inventory deploy/ansible/inventory.linode.yml deploy/ansible/playbook.yml
 
 # Seed a gitignored local config from the tracked example if it does not exist.
 _seed-config:

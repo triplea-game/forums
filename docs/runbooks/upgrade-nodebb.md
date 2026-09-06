@@ -110,9 +110,9 @@ can log in, and a topic loads.
   (`:ro`) mount crash-loops with `EROFS`; wrong ownership crash-loops with
   `EACCES`. The production compose (infra `forums` role) already mounts it
   writable with the right owner — the failure mode is *reintroducing* `:ro`.
-  Note this repo's local-dev `docker-compose.yml` still mounts `config.json`
-  `:ro`; that is fine for browsing locally but must never be copied to the prod
-  template.
+  The local-dev stack solves the same requirement differently (writable mount,
+  container-root under rootless Podman); see `run-forums-locally.md`. Its local
+  settings must never be copied into the prod template.
 - **`trust_proxy: true` must stay in `config.json`.** The forums sit behind
   nginx; without it, redirects and canonical URLs break.
 - **Plugins gate the boot.** If NodeBB starts but a plugin errors, the plugin

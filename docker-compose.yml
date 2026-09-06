@@ -1,34 +1,47 @@
 services:
-  mongodb:
-    image: mongo:8.0.21
+  postgres:
+    image: postgres:18
     restart: unless-stopped
+    environment:
+      POSTGRES_USER: nodebb
+      POSTGRES_PASSWORD: nodebb
+      POSTGRES_DB: nodebb
+    ports:
+      # Exposed on localhost so you can psql in from the host; NodeBB itself
+      # reaches Postgres over the internal network, not this port.
+      - "127.0.0.1:5432:5432"
     volumes:
-      - mongodb_data:/data/db
+      # postgres:18 keeps PGDATA in a subdirectory of this mount, so the volume
+      # is mounted a level up from the pre-18 path. Matches the prod 'forums'
+      # role, also on postgres:18.
+      - postgres_data:/var/lib/postgresql
     networks:
       - forums_internal
 
   nodebb:
     build: ./node-bb
     restart: unless-stopped
-    user: "1001:1001"
+    # Run as container-root, not prod's uid 1001. Under rootless Podman
+    # container-root maps to the invoking host user, who owns the bind-mounted
+    # config.json, so NodeBB can write it; the image's default uid 1001 maps to a
+    # subuid that can't, and setup/boot crash with EACCES on config.json.
+    user: "0:0"
     ports:
-      # Bind only to localhost so nginx (running on the host) can proxy to
-      # port 4567, but the port is not reachable from outside the server.
       - "127.0.0.1:4567:4567"
     volumes:
-      # Seeds config from the checked-in example; its 'url' points at prod, so
-      # copy it out and set url to http://localhost:4567 to browse locally.
-      - ./node-bb/example/config.json:/opt/config/config.json:ro
+      # Gitignored local config, seeded from example/config.json by `just up`.
+      # Mounted writable — NodeBB writes setup and migration state back to
+      # config.json on boot, so a ':ro' mount crash-loops with EROFS.
+      - ./node-bb/config.local.json:/opt/config/config.json
       - nodebb_uploads:/usr/src/app/public/uploads
     depends_on:
-      - mongodb
+      - postgres
     networks:
       - forums_internal
 
 volumes:
-  mongodb_data:
+  postgres_data:
   nodebb_uploads:
 
 networks:
   forums_internal:
-

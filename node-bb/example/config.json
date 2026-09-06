@@ -1,14 +1,14 @@
 {
-    "url": "https://forums.triplea-game.org",
+    "url": "http://localhost:4567",
     "secret": "replace-with-a-random-secret",
-    "database": "mongo",
-    "port": "4567",
-    "mongo": {
-        "host": "mongodb",
-        "port": "27017",
-        "username": "",
-        "password": "",
+    "database": "postgres",
+    "port": 4567,
+    "postgres": {
+        "host": "postgres",
+        "port": "5432",
+        "username": "nodebb",
+        "password": "nodebb",
         "database": "nodebb",
-        "uri": ""
+        "ssl": false
     }
 }

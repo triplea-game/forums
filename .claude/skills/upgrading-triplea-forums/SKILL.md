@@ -26,7 +26,7 @@ CI builds the image and deploys it; there is no manual build or SSH step.
    at the target tag, re-applying any TripleA-only entries (today: none), then
    **`just lock`** to regenerate `package-lock.json` inside the new base image.
    `npm ci` in the image build fails if the two disagree.
-4. **Push to `master`** — `.github/workflows/publish-docker.yml` builds/publishes
+4. **Push to `main`** — `.github/workflows/publish-docker.yml` builds/publishes
    `ghcr.io/triplea-game/forums/nodebb:latest` and runs the deploy job.
 5. **Verify** — logs show `🎉 NodeBB Ready` and `Setting 'trust proxy' to 1`;
    `https://forums.triplea-game.org` loads and login works.

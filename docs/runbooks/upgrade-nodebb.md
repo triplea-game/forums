@@ -13,7 +13,7 @@ build or SSH step for a normal version bump.
   version by tag and digest) plus `node-bb/install/package.json` and
   `package-lock.json` (the dependency tree, installed with `npm ci` so a build
   reproduces the lock exactly or fails).
-- On push to `master`, `.github/workflows/publish-docker.yml` builds that
+- On push to `main`, `.github/workflows/publish-docker.yml` builds that
   image, publishes it as `ghcr.io/triplea-game/forums/nodebb:latest`, and then
   runs the `deploy` job. Deploy runs `just deploy`, whose playbook SSHes to the
   forums host and runs `/usr/local/bin/deploy-forums.sh` — `docker compose pull
@@ -23,8 +23,8 @@ build or SSH step for a normal version bump.
   `triplea-game/infrastructure` repo. You only touch that repo when the deploy
   *shape* changes; a version bump does not.
 
-So: **push to `master` is the deploy.** The current running version is
-whatever `node-bb/Dockerfile` `FROM` points at on `master`.
+So: **push to `main` is the deploy.** The current running version is
+whatever `node-bb/Dockerfile` `FROM` points at on `main`.
 
 ## Preflight
 
@@ -88,7 +88,7 @@ All three files live under `node-bb/`.
 
 ## Ship it
 
-1. Commit and push to `master`.
+1. Commit and push to `main`.
 2. Watch the `Publish Docker Image` workflow. `build-and-push` must go green
    (a plugin or dependency that can't install fails here, before anything
    reaches production), then `deploy` runs automatically.

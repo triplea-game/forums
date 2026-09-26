@@ -2,7 +2,7 @@
 #
 # Runs the forums stack (NodeBB + Postgres) on your machine, mirroring the
 # production database (Postgres 18). Production itself is deployed by CI on push
-# to master (`just deploy`); nothing here touches production.
+# to main (`just deploy`); nothing here touches production.
 #
 # First run: `just up` builds the image, starts Postgres, sets up the schema and
 # an admin user, then starts NodeBB on http://localhost:4567.
@@ -49,7 +49,7 @@ logs:
 psql:
     {{compose}} exec postgres psql -U nodebb -d nodebb
 
-# Deploy to production — CI runs this on push to master; nothing local touches prod.
+# Deploy to production — CI runs this on push to main; nothing local touches prod.
 deploy:
     ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook -e ansible_user={{ssh_user}} --inventory deploy/ansible/inventory.linode.yml deploy/ansible/playbook.yml
 

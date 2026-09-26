@@ -1,5 +1,5 @@
 # Pinned by digest as well as tag: the tag is mutable upstream, and this image
-# is what deploys to production on every push to master.
+# is what deploys to production on every push to main.
 FROM ghcr.io/nodebb/nodebb:4.16.0@sha256:a7e3334de7ce667e8ce434657204f3f9fcc6fabf61f66d16c3e5013aab2154ce
 
 WORKDIR /usr/src/app

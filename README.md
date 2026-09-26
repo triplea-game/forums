@@ -16,7 +16,7 @@ including connecting to the local database — is in
 
 ## Deploy
 
-On push to `master`, CI builds the NodeBB image, publishes it to GitHub Container
+On push to `main`, CI builds the NodeBB image, publishes it to GitHub Container
 Registry, and deploys it (`just deploy`). The host side (compose file,
 `config.json`, Postgres, secrets) is owned by the `forums` role in
 `triplea-game/infrastructure`.

@@ -18,7 +18,7 @@ login, connecting to the local database, and troubleshooting.
 
 ## Production
 
-Production is built and deployed by CI on push to `master`: the
+Production is built and deployed by CI on push to `main`: the
 `Publish Docker Image` workflow builds this image, publishes it as
 `ghcr.io/triplea-game/forums/nodebb:latest`, and deploys it. The host side (the
 compose file, `config.json`, Postgres, secrets) is owned by the `forums` role in

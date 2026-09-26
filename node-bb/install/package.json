@@ -170,7 +170,6 @@
         "@apidevtools/swagger-parser": "13.0.0",
         "@commitlint/cli": "21.2.2",
         "@commitlint/config-angular": "21.2.2",
-        "coveralls": "3.1.1",
         "@eslint/js": "10.0.1",
         "@stylistic/eslint-plugin": "5.10.0",
         "ajv": "8.20.0",
@@ -192,6 +191,13 @@
     },
     "resolutions": {
         "*/jquery": "3.7.1"
+    },
+    "overrides": {
+        "fflate": "0.7.5",
+        "globule": {
+            "minimatch": "3.1.5"
+        },
+        "lodash": "$lodash"
     },
     "bugs": {
         "url": "https://github.com/NodeBB/NodeBB/issues"

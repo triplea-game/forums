@@ -19,9 +19,11 @@ build or SSH step for a normal version bump.
   forums host and runs `/usr/local/bin/deploy-forums.sh`: `docker compose pull
   nodebb`, a full `docker compose up -d`, then a poll of NodeBB's `/sping` on
   loopback for 60 attempts (~5-10 min). If NodeBB never answers healthy, the
-  script prints `docker compose ps` and the last 100 nodebb log lines and fails
-  the `deploy` job. The job shows nothing while it polls; the script's output
-  reaches the job log only on failure. The `smoke` job then probes the public
+  script prints `docker compose ps` and fails the `deploy` job. The job shows
+  nothing while it polls; the script's output reaches the job log only on
+  failure. The nodebb log is never printed there, since the job log is public:
+  read it with `pull-logs.sh forums` per the infrastructure repo's
+  `docs/runbooks/debugging-triplea-production.md`. The `smoke` job then probes the public
   `https://forums.triplea-game.org/sping` through nginx.
 - The host side (the compose file, `config.json`, Postgres, secrets, the
   `deploy-forums.sh` script itself) is owned by the `forums` role in the
@@ -120,10 +122,10 @@ can log in, and a topic loads.
 
 - **A red `deploy` or `smoke` does not roll back.** The check runs after
   `up -d`, so the new image is already live. A red `deploy` log holds
-  `Pre-deploy health: UP` or `Pre-deploy health: DOWN or unreachable`,
-  `docker compose ps` and the nodebb log tail. On the first run, DOWN means the
-  forums were already unhealthy, so reverting may not help; on a re-run it only
-  reflects the earlier attempt. On a NodeBB bump, look in the log tail for a
+  `Pre-deploy health: UP` or `Pre-deploy health: DOWN or unreachable` and
+  `docker compose ps`; pull the nodebb log from the host (see above). On the
+  first run, DOWN means the forums were already unhealthy, so reverting may not help; on a re-run it only
+  reflects the earlier attempt. On a NodeBB bump, look in that log for a
   `nodebb upgrade` still running before reverting, since migration time is
   unmeasured and may outlast the poll; if one is, wait, then re-run the failed
   `deploy` job, which runs the script again (an unchanged container is left

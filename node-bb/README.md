@@ -52,16 +52,16 @@ This is the NodeBB version the forums currently run; the README and
 
 | TripleA Forums | NodeBB Version | Package Json |
 |----------------|----------------|--------------|
-| Current        | 4.15.2         | [source](https://github.com/NodeBB/NodeBB/blob/v4.15.2/install/package.json) |
+| Current        | 4.16.0         | [source](https://github.com/NodeBB/NodeBB/blob/v4.16.0/install/package.json) |
 
 ## Plugins
 
 NodeBB customizations are plugins, installed by pinning them in
 `install/package.json` (the `nodebb-plugin-*` and `nodebb-theme-*` entries),
 running `just lock`, and rebuilding the image. That file is the authoritative
-list. Today it is byte-identical to NodeBB's own `install/package.json`: every
-plugin and theme the forums run is one NodeBB bundles, so a version bump is a
-straight copy of upstream plus a lock regeneration (see
+list. It is NodeBB's own `install/package.json` plus one addition,
+`nodebb-plugin-cloudflare-turnstile`, so a version bump is a copy of upstream
+with that line re-applied, plus a lock regeneration (see
 `docs/runbooks/upgrade-nodebb.md`).
 
 ## Database indices

@@ -70,9 +70,9 @@ All three files live under `node-bb/`.
    own `install/package.json` at the target tag —
    `https://github.com/NodeBB/NodeBB/blob/v<new-version>/install/package.json` —
    and re-apply whatever this repo has changed on top of stock. Today that is
-   nothing: the file is byte-identical to upstream, and every plugin and theme
-   the forums run ships in NodeBB's own dependency list. Diff before you copy
-   so a future TripleA-only entry does not get lost.
+   one line, `nodebb-plugin-cloudflare-turnstile`. Diff the current file
+   against upstream at the *old* tag before you copy, so a TripleA-only entry
+   does not get lost.
 
 3. **Regenerate `node-bb/install/package-lock.json`** inside the new base
    image, so the lock resolves against the tree that image already carries

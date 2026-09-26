@@ -63,3 +63,12 @@ list. Today it is byte-identical to NodeBB's own `install/package.json`: every
 plugin and theme the forums run is one NodeBB bundles, so a version bump is a
 straight copy of upstream plus a lock regeneration (see
 `docs/runbooks/upgrade-nodebb.md`).
+
+## Database indices
+
+NodeBB creates its database indices only during `nodebb setup`, so a database
+that arrives any other way (a restore, or the forums' old Mongo-to-Postgres
+migration) runs without them, and every write full-scans `legacy_object`. The
+image's entrypoint (`startup/entrypoint.sh`) runs NodeBB's own `createIndices`
+before every start, which is a no-op once they exist. It's skipped during setup
+and before a config exists, and a failure is logged without blocking the start.

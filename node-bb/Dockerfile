@@ -15,3 +15,7 @@ RUN npm ci --omit=dev && \
     npm cache clean --force
 
 EXPOSE 4567
+
+COPY startup/ensure-indices.js ./
+COPY startup/entrypoint.sh /usr/local/bin/triplea-entrypoint.sh
+ENTRYPOINT ["tini", "--", "triplea-entrypoint.sh"]

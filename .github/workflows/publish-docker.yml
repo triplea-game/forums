@@ -73,3 +73,39 @@ jobs:
           LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_READ_ONLY_TOKEN }}
         run: SSH_USER=deploy just deploy
 
+  # End-to-end smoke test of the just-deployed forum, through the real public
+  # path (nginx -> NodeBB -> Postgres). A red job here turns the build red, which
+  # emails on failure. This is an alarm, not a gate: the deploy has already
+  # happened, so it signals "this deploy broke prod" rather than preventing it.
+  smoke:
+    runs-on: ubuntu-latest
+    needs: deploy
+    permissions: {}
+    steps:
+      # NodeBB's /sping runs a Postgres query before answering 'healthy', so a
+      # 200 confirms the app booted and its database is reachable. It goes
+      # through nginx's site-wide (not per-IP) render rate limit, shared with
+      # every visitor, so scraper load alone can fail it; the failure message
+      # says how to tell.
+      - name: Smoke-test the deployed forums
+        run: |
+          url="https://forums.triplea-game.org/sping"
+          max_attempts=12
+          for attempt in $(seq 1 "$max_attempts"); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)
+            if [ "$code" = "200" ]; then
+              echo "Smoke check passed: HTTP $code from $url (attempt $attempt)"
+              exit 0
+            fi
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              echo "Attempt $attempt: HTTP $code from $url; retrying in 10s"
+              sleep 10
+            fi
+          done
+          echo "Smoke check FAILED: $url never returned 200 (last: HTTP $code)."
+          echo "The deploy job's loopback check passed, so suspect the public path:"
+          echo "503 = nginx's site-wide rate limit (scraper load; re-run this job to confirm),"
+          echo "502 = nginx cannot reach NodeBB, 000 = no HTTP response (a 10s timeout, eg: NodeBB"
+          echo "hanging on its database, or a DNS/TLS/connection error; the curl error above says which)."
+          exit 1
+

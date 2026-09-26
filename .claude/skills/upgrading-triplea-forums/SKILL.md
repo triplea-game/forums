@@ -27,9 +27,11 @@ CI builds the image and deploys it; there is no manual build or SSH step.
    **`just lock`** to regenerate `package-lock.json` inside the new base image.
    `npm ci` in the image build fails if the two disagree.
 4. **Push to `main`** — `.github/workflows/publish-docker.yml` builds/publishes
-   `ghcr.io/triplea-game/forums/nodebb:latest` and runs the deploy job.
-5. **Verify** — logs show `🎉 NodeBB Ready` and `Setting 'trust proxy' to 1`;
-   `https://forums.triplea-game.org` loads and login works.
+   `ghcr.io/triplea-game/forums/nodebb:latest`, runs `deploy` (fails if NodeBB
+   never becomes healthy), then `smoke` (probes the public URL).
+5. **Verify** — both jobs green first; then logs show `🎉 NodeBB Ready` and
+   `Setting 'trust proxy' to 1`; `https://forums.triplea-game.org` loads and
+   login works.
 
 Stop and consult the runbook for: plugin-compatibility failures, rollback, or
 any `config.json` / `trust_proxy` / `EROFS` / `EACCES` boot crash.

@@ -72,3 +72,13 @@ migration) runs without them, and every write full-scans `legacy_object`. The
 image's entrypoint (`startup/entrypoint.sh`) runs NodeBB's own `createIndices`
 before every start, which is a no-op once they exist. It's skipped during setup
 and before a config exists, and a failure is logged without blocking the start.
+
+## Session table
+
+Every cookieless page render stores a CSRF token in a new session, so guest
+and scraper traffic turns into a steady stream of writes to the `session`
+table. The entrypoint makes that table UNLOGGED (`startup/ensure-unlogged-session.js`),
+which skips the WAL for those writes. The tradeoff: after a Postgres crash or
+unclean shutdown the table comes back empty and everyone is logged out. The
+first start after this lands rewrites the table under an exclusive lock, which
+lengthens that one boot; later starts see it's already UNLOGGED and do nothing.

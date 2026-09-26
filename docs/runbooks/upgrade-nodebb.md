@@ -141,7 +141,8 @@ can log in, and a topic loads.
   right after the `COPY` step means `package.json` changed without `just lock`;
   regenerate and re-push.
 - **The image wraps upstream's `entrypoint.sh`.** `startup/entrypoint.sh`
-  creates NodeBB's database indices, then `exec`s the base image's
+  creates NodeBB's database indices and makes the session table UNLOGGED, then
+  `exec`s the base image's
   `entrypoint.sh` by name. If a new base image renames or moves that script,
   the container won't start. A healthy boot logs `Checking database indices
   done!` before the `DEBUG: CONFIG location` line.

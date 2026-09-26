@@ -16,6 +16,6 @@ RUN npm ci --omit=dev && \
 
 EXPOSE 4567
 
-COPY startup/ensure-indices.js ./
+COPY startup/ensure-indices.js startup/ensure-unlogged-session.js ./
 COPY startup/entrypoint.sh /usr/local/bin/triplea-entrypoint.sh
 ENTRYPOINT ["tini", "--", "triplea-entrypoint.sh"]

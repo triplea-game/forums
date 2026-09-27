@@ -44,8 +44,14 @@ whatever `node-bb/Dockerfile` `FROM` points at on `main`.
    ```
 
    (rendered from the `forums` role's `backup.sh.j2`; it `pg_dump`s the `nodebb`
-   database and rsyncs it to the backup host). Confirm a fresh dump landed
+   database and rsyncs it to the lobby host). Confirm a fresh dump landed
    before continuing.
+
+   **Only the Postgres dump is backed up off-host.** Uploads — attachments,
+   avatars, and the rest of `/opt/triplea-forums/uploads` — are not: they are
+   too large to ship and would fill the lobby host's disk. A NodeBB upgrade
+   does not normally touch them, but no backup can restore them if it does, or
+   if the forums host is lost.
 
 2. **Pick the target version and read its release notes.** NodeBB documents
    breaking changes and required plugin versions per release. Note the tag, eg
@@ -139,7 +145,8 @@ can log in, and a topic loads.
   on the host and `up -d`, then fix forward in the repo.
 - **Restore the database** from the preflight dump only if a schema migration
   ran and left the DB in a state the older NodeBB can't read. A version bump
-  without a completed migration usually needs only the image rollback.
+  without a completed migration usually needs only the image rollback. The
+  dump restores posts, users, and settings only; uploads have no backup.
 
 ## Gotchas
 

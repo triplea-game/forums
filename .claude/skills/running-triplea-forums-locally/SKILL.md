@@ -24,7 +24,7 @@ the two disagree, the runbook wins.
    (override on first run with `ADMIN_USER` / `ADMIN_PASSWORD` / `ADMIN_EMAIL`).
 3. **Connect to the DB** — `just psql`, or a host client on `127.0.0.1:5432`
    (database `nodebb`, user `nodebb`, password `nodebb`).
-4. **Stop / reset** — `just down` keeps data; `just reset` wipes the DB, uploads,
+4. **Stop / clean** — `just down` keeps data; `just clean` wipes the DB, uploads,
    and local config for a clean install.
 
 Stop and consult the runbook for: an `EACCES`/`EROFS` crash on `config.json`, a

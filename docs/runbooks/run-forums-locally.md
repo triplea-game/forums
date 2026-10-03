@@ -35,7 +35,7 @@ skips straight to starting the stack.
 | --- | --- |
 | `just up` | Build, start Postgres + NodeBB, set up the DB on first run. |
 | `just down` | Stop the stack, keeping the database and uploads. |
-| `just reset` | Stop and wipe everything — Postgres data, uploads, and the local config. Next `just up` is a fresh install. |
+| `just clean` | Stop and wipe everything — Postgres data, uploads, and the local config. Next `just up` is a fresh install. |
 | `just logs` | Follow the NodeBB logs. |
 | `just psql` | Open a `psql` shell on the local database. |
 
@@ -115,7 +115,7 @@ with `trust_proxy: 1`).
   earlier NodeBB or Postgres container) holds the port. Free it, or `just down`
   the leftover stack.
 - **Setup hangs** — the admin password was rejected as too short or too weak and
-  NodeBB fell back to an interactive prompt. `just reset`, then `just up` with a
+  NodeBB fell back to an interactive prompt. `just clean`, then `just up` with a
   stronger `ADMIN_PASSWORD`.
-- **Start over** — `just reset` wipes the database, uploads, and local config for
+- **Start over** — `just clean` wipes the database, uploads, and local config for
   a clean install.

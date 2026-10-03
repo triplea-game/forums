@@ -20,6 +20,9 @@ export ADMIN_EMAIL := env_var_or_default("ADMIN_EMAIL", "admin@localhost.local")
 # Deploy uses this ssh user (defaults to $USER); CI passes SSH_USER=deploy.
 ssh_user := env_var_or_default("SSH_USER", env_var_or_default("USER", ""))
 
+alias run := up
+alias stop := down
+
 # List recipes
 default:
     @just --list
@@ -37,7 +40,7 @@ down:
     {{compose}} down
 
 # Stop and wipe all local state — Postgres data, uploads, and config.local.json.
-reset:
+clean:
     {{compose}} down -v
     rm -f {{config}}
 

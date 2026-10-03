@@ -48,10 +48,12 @@ whatever `node-bb/Dockerfile` `FROM` points at on `main`.
    before continuing.
 
    **Only the Postgres dump is backed up off-host.** Uploads — attachments,
-   avatars, and the rest of `/opt/triplea-forums/uploads` — are not: they are
-   too large to ship and would fill the lobby host's disk. A NodeBB upgrade
-   does not normally touch them, but no backup can restore them if it does, or
-   if the forums host is lost.
+   avatars, and the rest of `/opt/triplea-forums/uploads` — are not shipped by
+   the backup script: they are too large and would fill the lobby host's disk.
+   A NodeBB upgrade does not normally touch them. If it does, or the forums host
+   is lost, recovery depends on a Linode instance backup of the forums host,
+   which the infrastructure repo does not manage — confirm one exists in the
+   Linode console before relying on it.
 
 2. **Pick the target version and read its release notes.** NodeBB documents
    breaking changes and required plugin versions per release. Note the tag, eg
@@ -136,17 +138,23 @@ can log in, and a topic loads.
   unmeasured and may outlast the poll; if one is, wait, then re-run the failed
   `deploy` job, which runs the script again (an unchanged container is left
   running) and then `smoke`. A red `smoke` after a green `deploy`
-  usually points at nginx (503 is its site-wide rate limit, 502 is NodeBB
-  unreachable), not the build.
+  usually points at the public path, not the build: 503 is nginx's per-IP
+  limit on `/sping` or NodeBB itself refusing (nginx exempts `/sping` from
+  the site-wide render limit), and 502/504 mean NodeBB is down or hung.
 - **Roll back the version.** Deploys track the `:latest` tag, so there is no
   "redeploy the old one" button — revert the forums-repo commit and push again
   to rebuild `:latest` from the previous `Dockerfile`. If you need to roll back
-  faster than a rebuild, pin the compose `image:` to the previous image digest
-  on the host and `up -d`, then fix forward in the repo.
+  faster than a rebuild, pin the compose `image:` on the host to the previous
+  build and `up -d`, then fix forward in the repo. Every build is also pushed
+  as `ghcr.io/triplea-game/forums/nodebb:sha-<commit>`, so the previous good
+  commit's tag is the easiest target; a digest works too. Only builds since
+  `sha-` tagging began carry one, so the first rollback after that may have
+  no previous `sha-` tag and needs a digest.
 - **Restore the database** from the preflight dump only if a schema migration
   ran and left the DB in a state the older NodeBB can't read. A version bump
   without a completed migration usually needs only the image rollback. The
-  dump restores posts, users, and settings only; uploads have no backup.
+  dump restores posts, users, and settings only; uploads are not in it (see
+  the preflight note on the Linode instance backup).
 
 ## Gotchas
 

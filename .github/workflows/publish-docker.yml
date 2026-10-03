@@ -51,8 +51,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
-    # Shared with 'smoke' so deploys and their checks run one at a time on the
-    # host; 'queue: max' keeps a queued job from displacing a pending deploy.
+    # Shared with 'smoke' so one run's smoke never polls while another run's
+    # deploy has NodeBB mid-boot (deploy waits on loopback for up to ~5-10 min,
+    # longer than smoke's ~2-4 min of retries). A smoke queued behind a later
+    # deploy observes that later image, which is fine for an alarm but not a
+    # gate. 'queue: max' keeps a queued job from displacing a pending deploy.
     concurrency:
       group: ${{ github.workflow }}-deploy
       cancel-in-progress: false
@@ -103,10 +106,9 @@ jobs:
     permissions: {}
     steps:
       # NodeBB's /sping runs a Postgres query before answering 'healthy', so a
-      # 200 confirms the app booted and its database is reachable. nginx exempts
-      # /sping from the site-wide render rate limit (only the per-IP limit
-      # applies), so a 503 means the forums are overloaded or down, not that
-      # scrapers ate the shared budget.
+      # 200 confirms the app booted and its database is reachable. A 503 is
+      # nginx's per-IP limit on /sping or NodeBB itself refusing; nginx exempts
+      # /sping from the site-wide render limit. 502/504 mean NodeBB is down or hung.
       - name: Smoke-test the deployed forums
         run: |
           url="https://forums.triplea-game.org/sping"
@@ -124,8 +126,8 @@ jobs:
           done
           echo "Smoke check FAILED: $url never returned 200 (last: HTTP $code)."
           echo "The deploy job's loopback check passed, so suspect the public path:"
-          echo "503 = the forums are overloaded or down (/sping is exempt from the site-wide rate limit),"
-          echo "502 = nginx cannot reach NodeBB, 000 = no HTTP response (a 10s timeout, eg: NodeBB"
+          echo "503 = nginx's per-IP limit on /sping, or NodeBB itself refusing,"
+          echo "502/504 = NodeBB is down or hung, 000 = no HTTP response (a 10s timeout, eg: NodeBB"
           echo "hanging on its database, or a DNS/TLS/connection error; the curl error above says which)."
           exit 1
 

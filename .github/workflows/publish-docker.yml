@@ -89,6 +89,8 @@ jobs:
           ansible-galaxy collection install -r deploy/ansible/requirements.yml
       - name: Deploy
         env:
+          # Read-only on purpose: the Ansible dynamic inventory only reads server
+          # metadata (IPs, tags) from Linode. Deploy never creates or changes hosts.
           LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_READ_ONLY_TOKEN }}
         run: SSH_USER=deploy just deploy
 

@@ -52,7 +52,7 @@ This is the NodeBB version the forums currently run; the README and
 
 | TripleA Forums | NodeBB Version | Package Json |
 |----------------|----------------|--------------|
-| Current        | 4.16.0         | [source](https://github.com/NodeBB/NodeBB/blob/v4.16.0/install/package.json) |
+| Current        | 4.16.1         | [source](https://github.com/NodeBB/NodeBB/blob/v4.16.1/install/package.json) |
 
 ## Plugins
 
